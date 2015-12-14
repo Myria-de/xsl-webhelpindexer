@@ -159,10 +159,6 @@ public class SaxDocFileParser extends org.xml.sax.helpers.DefaultHandler {
             if (attrName != null && (attrName.equalsIgnoreCase("description"))) {
                 fileDesc.setShortdesc(BlankRemover.rmWhiteSpace(attributes.getValue("content").replace('\n', ' ')));
             }
-            
-            if (attrName != null && (attrName.equalsIgnoreCase("Section-Title"))) {
-                fileDesc.setTitle(BlankRemover.rmWhiteSpace(attributes.getValue("content").replace('\n', ' ')));
-            }
         } // dwc: End addition
 
         // dwc: commenting out DITA specific lines
@@ -173,7 +169,11 @@ public class SaxDocFileParser extends org.xml.sax.helpers.DefaultHandler {
         addHeaderInfo = qName.equalsIgnoreCase("meta") || qName.equalsIgnoreCase("title") || qName.equalsIgnoreCase("shortdesc");
 
         String elementId = attributes.getValue("id");
-        if ("content".equals(elementId)) addContent = true;
+        
+        // changed by ###te
+        // indexed content should be
+        // between <div id="content_idx">...</div>
+        if ("content_idx".equals(elementId)) addContent = true;
 
         if (addContent) {
             //counts div tags starting from "content" div(inclusive). This will be used to track the end of content "div" tag.
@@ -287,12 +287,12 @@ public class SaxDocFileParser extends org.xml.sax.helpers.DefaultHandler {
         // START OXYGEN PATCH, remove element from stack
         stack.pop();
         // END OXYGEN PATCH
-        /*if (qName.equalsIgnoreCase("title")) {
+        if (qName.equalsIgnoreCase("title")) {
             //add it to the list
             //myEmpls.add(tempEmp);
             fileDesc.setTitle(BlankRemover.rmWhiteSpace(tempVal.toString()));
             tempVal = null;
-        }*/ if (shortdescBool) {
+        } else if (shortdescBool) {
             shortTagCpt--;
             if (shortTagCpt == 0) {
                 String shortdesc = tempVal.toString().replace('\n', ' ');
